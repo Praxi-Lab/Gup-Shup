@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "513054045431",
+    "firebase_url": "https://captioncaptainbeta.firebaseio.com",
+    "project_id": "captioncaptainbeta",
+    "storage_bucket": "captioncaptainbeta.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:513054045431:android:ca113d39d2fb8b469dcff2",
+        "android_client_info": {
+          "package_name": "com.XD.captioncaptainbeta"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "513054045431-k774qh60oren81ms1kgbvlfjj7sngake.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.XD.captioncaptainbeta",
+            "certificate_hash": "0d1bf3c3b899909afd34f40b92d473b81e97e947"
+          }
+        },
+        {
+          "client_id": "513054045431-b2i2dido8h68f1ekt1ar37vj88o0knss.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWmUcW7gnkJ0fu1KGQer3q83HX__Z6eJc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "513054045431-b2i2dido8h68f1ekt1ar37vj88o0knss.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
