@@ -5,10 +5,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
+import 'dart:async';
+
 class ChatPage extends StatefulWidget {
-  ChatPage(this.user, this.chatid) : super();
+  ChatPage(this.user, this.chatid, this.chatName) : super();
   final user;
   final chatid;
+  final chatName;
   //DateTime _date = DateTime.now();
 
   @override
@@ -24,6 +27,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   final TextEditingController _textController = new TextEditingController();
   ScrollController scrollController = ScrollController();
   bool _isWriting = false;
+
+  int count = 0;
 
   Future<void> callback(String txt) async {
     DateTime _date = DateTime.now();
@@ -46,12 +51,22 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     }
   }
 
+  _chatColor(snapshot, index) {
+    if (snapshot.data.documents[index]['from'] == widget.user.email) {
+      return Colors.grey[500];
+    } else {
+      return Colors.grey[400];
+    }
+  }
+
   // _itemCount(snapshot){
 
   //   try{ return snapshot.data.documents.length;}
   //   catch(e){print(e);}
 
   // }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +80,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
             onPressed: () => Navigator.pop(context)),
         backgroundColor: Color(0xffEAB543),
         title: Text(
-          "Chat",
+          widget.chatName,
           style: TextStyle(
             color: Color(0xfff5f5f5),
             fontSize: 22,
@@ -80,7 +95,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
           children: <Widget>[
             new Flexible(
                 child: StreamBuilder(
-                    stream: FirebaseFirestore.instance
+                    stream: _fireStore
                         .collection('chatGroups')
                         .doc('${widget.chatid}')
                         .collection('messages')
@@ -96,6 +111,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                       // }
 
                       return ListView.builder(
+                          controller: scrollController,
                           itemCount: snapshot.data.docs.length,
                           //reverse: true,
 
@@ -106,7 +122,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.rectangle,
                                   borderRadius: BorderRadius.circular(20),
-                                  color: Colors.white,
+                                  color: _chatColor(snapshot, index),
                                 ),
                                 child: Column(
                                   crossAxisAlignment:
@@ -115,13 +131,15 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                                     Padding(
                                       padding: const EdgeInsets.only(
                                           right: 10.0, left: 10),
-                                      child: Text(
-                                        '${snapshot.data.docs[index]['from'].toString().split('@')[0]}',
-                                        style: TextStyle(
-                                          color: Color(0xff3498db),
-                                          fontSize: 15,
-                                          fontFamily: 'SFDisplay',
-                                          fontWeight: FontWeight.w200,
+                                      child: CircleAvatar(
+                                        child: Text(
+                                          '${snapshot.data.docs[index]['from'].toString().split('@')[0]}',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                            fontFamily: 'SFDisplay',
+                                            fontWeight: FontWeight.w200,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -150,7 +168,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                                       child: Text(
                                         '${snapshot.data.docs[index]['time'].toString().substring(11, 16)}',
                                         style: TextStyle(
-                                          color: Colors.grey,
+                                          color: Colors.grey[700],
                                           fontSize: 12,
                                           fontFamily: 'SFDisplay',
                                           fontWeight: FontWeight.w500,
@@ -161,13 +179,9 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                                 ));
                           });
                     })),
-            new Divider(height: 1.0),
-            new Container(
-                child: _buildComposer(), //this is the input field
-                decoration: new BoxDecoration(
-                  color: Colors.transparent,
-                )),
+                    _buildComposer(),
           ],
+          
         ),
       ),
     );
@@ -204,21 +218,26 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: new Container(
+              padding: const EdgeInsets.all(8.0),
+              child: new Container(
                 decoration: BoxDecoration(
                   color: Color(0xff3498db),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 margin: EdgeInsets.symmetric(horizontal: 3.0),
                 child: new IconButton(
-                  //Send Button
-                  icon: Icon(Icons.send, color: Color(0xfff5f5f5)),
-                  onPressed: _isWriting
-                      ? () => _submitMsg(_textController.text)
-                      : null,
-                )),
-          )
+                    //Send Button
+                    icon: Icon(Icons.send, color: Color(0xfff5f5f5)),
+                    onPressed: () {
+                      if (_isWriting) {
+                        _submitMsg(_textController.text);
+                        Timer(
+                            Duration(milliseconds: 500),
+                            () => scrollController.jumpTo(
+                                scrollController.position.maxScrollExtent));
+                      }
+                    }),
+              ))
         ],
       ),
       //  ),
