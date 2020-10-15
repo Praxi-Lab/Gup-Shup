@@ -82,12 +82,12 @@ class _LoginPageState extends State<LoginPage> {
           print("TESSST");
           print(user);
 
-          // widget.fireStore.collection("users").add({
-          //   "name": _name,
-          //   "email": _email,
-          // }).then((value) => null);
+          widget.fireStore.collection("users").add({
+            "name": _name,
+            "email": _email,
+          }).then((value) => null);
 
-          // print('Registered user: ${user.uid}');
+          print('Registered user: ${user.uid}');
 
           if (user != null) {
             Navigator.push(context,

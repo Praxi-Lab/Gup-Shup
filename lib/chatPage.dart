@@ -8,9 +8,10 @@ import 'package:flutter/painting.dart';
 import 'dart:async';
 
 class ChatPage extends StatefulWidget {
-  ChatPage(this.user, this.chatid) : super();
+  ChatPage(this.user, this.chatid, this.chatName) : super();
   final user;
   final chatid;
+  final chatName;
   //DateTime _date = DateTime.now();
 
   @override
@@ -65,6 +66,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
 
   // }
 
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,7 +80,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
             onPressed: () => Navigator.pop(context)),
         backgroundColor: Color(0xffEAB543),
         title: Text(
-          "Chat",
+          widget.chatName,
           style: TextStyle(
             color: Color(0xfff5f5f5),
             fontSize: 22,
@@ -92,7 +95,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
           children: <Widget>[
             new Flexible(
                 child: StreamBuilder(
-                    stream: FirebaseFirestore.instance
+                    stream: _fireStore
                         .collection('chatGroups')
                         .doc('${widget.chatid}')
                         .collection('messages')
@@ -176,8 +179,9 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                                 ));
                           });
                     })),
-            
+                    _buildComposer(),
           ],
+          
         ),
       ),
     );
