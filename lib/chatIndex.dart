@@ -11,16 +11,18 @@ class ChatIndex extends StatefulWidget {
   State<StatefulWidget> createState() => ChatIndexState();
 }
 
+// This Page will show the user all their chats
 class ChatIndexState extends State<ChatIndex> {
-  String _chatname;
   final TextEditingController _textController = new TextEditingController();
   bool _isWriting = false;
   String addEmail;
 
   FirebaseFirestore _fireStore = FirebaseFirestore.instance;
   QuerySnapshot querySnapshot;
-  List users = [];
-  List openChats = [];
+
+  // We will need these 2 lists while defining _addNewChat() function
+  List users = []; // list of all users on the app
+  List openChats = []; // list of chats of user
 
   bool isLoading = false;
 
@@ -30,6 +32,7 @@ class ChatIndexState extends State<ChatIndex> {
     super.initState();
   }
 
+  // Gets list of all users (needed to start a new chat)
   void getUsers() async {
     querySnapshot = await _fireStore.collection('users').get();
     var list = querySnapshot.docs;
@@ -39,7 +42,8 @@ class ChatIndexState extends State<ChatIndex> {
     print(users);
   }
 
-  Future<void> callback(String email) async {
+  // Function to create a new chat
+  Future<void> addChat(String email) async {
     List l = [widget.user.email, email];
     DocumentReference reference =
         await _fireStore.collection('chatGroups').add({
@@ -62,8 +66,8 @@ class ChatIndexState extends State<ChatIndex> {
               Padding(
                 padding: const EdgeInsets.all(6.0),
                 child: Container(
-                  color: Color(0xffecf0f1),
-                  alignment: Alignment.topLeft,
+                    color: Color(0xffecf0f1),
+                    alignment: Alignment.topLeft,
                     child: Text(
                       "Chats",
                       style: TextStyle(
@@ -76,6 +80,8 @@ class ChatIndexState extends State<ChatIndex> {
               ),
               Container(
                   color: Color(0xffecf0f1),
+                  // This streamBuilder will show all chats
+                  // We can also use a Future Builder for this
                   child: StreamBuilder(
                       stream: FirebaseFirestore.instance
                           .collection('chatGroups')
@@ -84,11 +90,28 @@ class ChatIndexState extends State<ChatIndex> {
                         if (isLoading) {
                           return CircularProgressIndicator();
                         }
-                        int count = 0;
-                        List<int> indices = [];
-                        List<String> ids = [];
 
-                        for (var i = 0; i < snapshot.data.documents.length; i++) {
+                        // These variables will hold
+                        int count = 0; // no of chats
+                        List<int> indices =
+                            []; // index of each chat in the snapshot
+                        List<String> ids = []; //  document ID of each chat
+
+                        // Why do we need these variables?
+                        // 1. We need count to display the chatnames
+                        // 2. We need indices to get the groupChat document from
+                        //    the snapshot for which we'll need their indices
+                        // 3. We need document IDs to be able to update the
+                        //    message collection inside the doc when sending
+                        //    messages.
+
+                        // Finds all chatGroups where user is present and
+                        // 1. stores all their indices in indices
+                        // 2. Stores the number of these chatGroups in count
+                        // 3. Stores their ids in ids
+                        for (var i = 0;
+                            i < snapshot.data.documents.length;
+                            i++) {
                           if (snapshot.data.documents[i]['users']
                               .toString()
                               .contains(widget.user.email.toString())) {
@@ -132,14 +155,19 @@ class ChatIndexState extends State<ChatIndex> {
                             ],
                           );
                         }
-
                         return ListView.builder(
-                          shrinkWrap: true,
+                            shrinkWrap: true,
                             itemCount: count,
                             itemBuilder: (ctx, index) {
+                              String _chatname;
+
+                              // Using List<int> indices where we stored indices of
+                              // required chatGroups
                               List t = snapshot.data.documents[indices[index]]
                                   .data()['users'];
 
+                              // Getting chatname from email
+                              // and adding email to List openChats
                               for (var i in t) {
                                 if (i != widget.user.email) {
                                   var x = i.toString().split('@')[0];
@@ -148,6 +176,10 @@ class ChatIndexState extends State<ChatIndex> {
                                 }
                               }
 
+                              // The next part just displayes/passes the information
+                              // we created so far
+                              // Using inkwell to navigate to chatPage
+                              // And displaying _chatName
                               return InkWell(
                                 onTap: () {
                                   Navigator.push(
@@ -162,8 +194,8 @@ class ChatIndexState extends State<ChatIndex> {
                                               _chatname)));
                                 },
                                 child: Column(
-                                  
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
                                   children: <Widget>[
                                     Container(
                                         color: Color(0xfff5f5f5),
@@ -191,15 +223,18 @@ class ChatIndexState extends State<ChatIndex> {
           ),
         ),
       ),
+
+      // Button to start a new chat (add a new user)
       floatingActionButton: Builder(
         builder: (ctx) => new FloatingActionButton(
-            onPressed: () => _showMaterialDialog(ctx),
+            onPressed: () => _addNewChat(ctx),
             child: Icon(Icons.add, color: Color(0xfff5f5f5))),
       ),
     );
   }
 
-  _showMaterialDialog(BuildContext c) {
+// Creates toast asking email to start a new chat
+  _addNewChat(BuildContext c) {
     showDialog(
         context: c,
         builder: (_) => new AlertDialog(
@@ -231,7 +266,7 @@ class ChatIndexState extends State<ChatIndex> {
                       setState(() {
                         isLoading = true;
                       });
-                      callback(addEmail);
+                      addChat(addEmail);
                       setState(() {
                         isLoading = false;
                       });

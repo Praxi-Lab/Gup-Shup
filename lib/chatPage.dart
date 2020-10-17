@@ -22,27 +22,27 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
 
-  //final List<Msg> _messages = <Msg>[];
-
   final TextEditingController _textController = new TextEditingController();
   ScrollController scrollController = ScrollController();
   bool _isWriting = false;
 
-  int count = 0;
-
+  // Callback to create a new message
   Future<void> callback(String txt) async {
     DateTime _date = DateTime.now();
 
+    // Creating document with custom ID
     DocumentReference reference = _fireStore
         .collection('chatGroups')
         .doc('${widget.chatid}')
         .collection('messages')
         .doc('$_date${widget.user.email}');
 
+    // Updaing created doc with message details
     reference
         .set({'from': widget.user.email, 'msg': txt, 'time': _date.toString()});
   }
 
+  // Function for alignement of msg to left/right
   _alignment(snapshot, index) {
     if (snapshot.data.documents[index]['from'] == widget.user.email) {
       return CrossAxisAlignment.end;
@@ -51,6 +51,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     }
   }
 
+// Similar function for color of msg box
   _chatColor(snapshot, index) {
     if (snapshot.data.documents[index]['from'] == widget.user.email) {
       return Colors.grey[500];
@@ -58,15 +59,6 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       return Colors.grey[400];
     }
   }
-
-  // _itemCount(snapshot){
-
-  //   try{ return snapshot.data.documents.length;}
-  //   catch(e){print(e);}
-
-  // }
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -113,9 +105,8 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                       return ListView.builder(
                           controller: scrollController,
                           itemCount: snapshot.data.docs.length,
-                          //reverse: true,
-
                           itemBuilder: (context, index) {
+                            // Displaying each message document as a message
                             return Container(
                                 padding: EdgeInsets.only(top: 10, bottom: 10),
                                 margin: EdgeInsets.only(top: 10),
@@ -179,9 +170,9 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
                                 ));
                           });
                     })),
-                    _buildComposer(),
+            // This will build the textfield and send button
+            _buildComposer(),
           ],
-          
         ),
       ),
     );
