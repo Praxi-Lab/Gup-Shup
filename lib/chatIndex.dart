@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'chatPage.dart';
+import 'package:location/location.dart';
+import 'showLocation.dart';
 
 class ChatIndex extends StatefulWidget {
   ChatIndex(this.user);
@@ -25,6 +27,10 @@ class ChatIndexState extends State<ChatIndex> {
   List openChats = []; // list of chats of user
 
   bool isLoading = false;
+
+  //LOCATION
+
+  Location location = new Location();
 
   @override
   void initState() {
@@ -57,6 +63,22 @@ class ChatIndexState extends State<ChatIndex> {
     return Scaffold(
       appBar: AppBar(
         title: Text('GupShup'),
+        bottom: PreferredSize(
+            preferredSize: Size.fromHeight(70),
+            child: GestureDetector(
+              onTap: () {
+                print("Map");
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (ctx) => ShowLocation()));
+              },
+              child: Container(
+                alignment: Alignment.center,
+                child: Text("OPEN GOOGLE MAPS"),
+                height: 50,
+                width: 300,
+                decoration: BoxDecoration(color: Colors.blueAccent),
+              ),
+            )),
       ),
       body: Builder(
         builder: (ctx) => Container(
@@ -181,18 +203,16 @@ class ChatIndexState extends State<ChatIndex> {
                               // Using inkwell to navigate to chatPage
                               // And displaying _chatName
                               return InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (ctx) => ChatPage(
-                                              widget.user,
-                                              snapshot
-                                                  .data
-                                                  .documents[indices[index]]
-                                                  .documentID,
-                                              _chatname)));
-                                },
+                                onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (ctx) => ChatPage(
+                                            widget.user,
+                                            snapshot
+                                                .data
+                                                .documents[indices[index]]
+                                                .documentID,
+                                            _chatname))),
                                 child: Column(
                                   crossAxisAlignment:
                                       CrossAxisAlignment.stretch,
@@ -287,7 +307,8 @@ void _showToast(BuildContext context) {
   final scaffold = Scaffold.of(context);
   scaffold.showSnackBar(
     SnackBar(
-      content: const Text('Email does not exist'),
+      content: const Text(
+          'Given email does not exist on GupShup. Please ask your friend to signup on our app.'),
     ),
   );
 }

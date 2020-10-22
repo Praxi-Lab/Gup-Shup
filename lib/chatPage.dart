@@ -65,12 +65,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         leading: FloatingActionButton(
-            backgroundColor: Color(0xffEAB543),
+            backgroundColor: Colors.blue,
             elevation: 0,
             child: Icon(Icons.arrow_back, color: Color(0xfff5f5f5)),
             heroTag: "go back",
             onPressed: () => Navigator.pop(context)),
-        backgroundColor: Color(0xffEAB543),
+        backgroundColor: Colors.blue,
         title: Text(
           widget.chatName,
           style: TextStyle(
