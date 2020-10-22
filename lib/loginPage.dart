@@ -34,6 +34,7 @@ class _LoginPageState extends State<LoginPage> {
 
   FormType _formType = FormType.login;
 
+  // Validates email and password
   bool validateAndSave() {
     final form = formKey.currentState;
     if (form.validate()) {
@@ -47,16 +48,25 @@ class _LoginPageState extends State<LoginPage> {
 //----------------------------------------------
 //      Validate, Store, Navigate
 //----------------------------------------------
+// This is the main login/signup function
+// 1. Verify data from Firebase
+// 2. If signing up - add data to FireStore
+// 3. Navigate
   void validateAndSubmit() async {
     if (validateAndSave()) {
       try {
+        // Login
         if (_formType == FormType.login) {
           UserCredential userCredential;
+          User user;
+          // Verifying from Firebase
           try {
             userCredential = await widget._auth
                 .signInWithEmailAndPassword(email: _email, password: _password);
             print(_email);
             print(_password);
+            // Storing the data in user
+            user = userCredential.user;
           } on FirebaseAuthException catch (e) {
             if (e.code == 'user-not-found') {
               print('No user found for that email.');
@@ -64,17 +74,20 @@ class _LoginPageState extends State<LoginPage> {
               print('Wrong password provided for that user.');
             }
           }
-          User user = userCredential.user;
 
           print('Signed in: ${user.uid}');
 
           print(user.email);
 
+          // Navigating
           if (user != null) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ChatIndex(user)));
           }
         } else {
+          // Sign UP
+
+          // Creating user at Firebase
           dynamic result = await widget._auth.createUserWithEmailAndPassword(
               email: _email, password: _password);
           User user = result.user;
@@ -82,6 +95,7 @@ class _LoginPageState extends State<LoginPage> {
           print("TESSST");
           print(user);
 
+          // Adding user data to firestore
           widget.fireStore.collection("users").add({
             "name": _name,
             "email": _email,
@@ -89,6 +103,7 @@ class _LoginPageState extends State<LoginPage> {
 
           print('Registered user: ${user.uid}');
 
+          // Navigating
           if (user != null) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ChatIndex(user)));

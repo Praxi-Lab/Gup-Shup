@@ -1,0 +1,8 @@
+Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => ChatScreen(
+                                  user: widget.user,
+                                    name: recipient,
+                                    email: recipientEmail,
+                                    chatid: snapshot.data.documents[currentUserIndices[index]].documentID )))
