@@ -1,2 +1,2 @@
 # Gup-Shup
-chat app
+chat app with flutter
