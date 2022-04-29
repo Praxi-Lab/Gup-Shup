@@ -17,8 +17,8 @@ jobs:
           args: >
             -X
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: c9fe364fb4eef1e44dac738f0b5746ef7a46b4dc
+          SONAR_HOST_URL: https://exl.workbench.couture.ai/projects/
       # If you wish to fail your job when the Quality Gate is red, uncomment the
       # following lines. This would typically be used to fail a deployment.
       # - uses: sonarsource/sonarqube-quality-gate-action@master
